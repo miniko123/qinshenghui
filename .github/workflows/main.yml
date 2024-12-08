@@ -1,20 +1,25 @@
 name: 签到 # yml文件名
-
+ 
 on:
   workflow_dispatch:
   schedule:   
-    # 每天9点执行签到
-    - cron: '0 1 * * *'  # UTC 时间 1:00，对应中国时间9:00
-    # 每天18点执行签到
-    - cron: '0 10 * * *'  # UTC 时间 10:00，对应中国时间18:00
-
+    # https://crontab.guru/
+    # UTC 时间，中国时区应减 8
+    #         ┌────────── minute (0 - 59)
+    #         │ ┌──────── hour (0 - 23)
+    #         │ │ ┌────── day of the month (1 - 31)
+    #         │ │ │ ┌──── month (1 - 12 or JAN-DEC)
+    #         │ │ │ │ ┌── day of the week (0 - 6 or SUN-SAT)
+    #         │ │ │ │ │
+    - cron: '0 1 * * *'
+ 
 jobs:
   run-check-in: # 任务名
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+        
       - uses: actions/setup-node@v3
         with:
           node-version: '20.x'
@@ -23,12 +28,6 @@ jobs:
         run: |
           npm install
 
-      - name: 运行签到 - 9点签到
-        if: github.event.schedule == '0 1 * * *'  # 仅在9点任务时执行
+      - name: 运行签到
         run: |
           node ./index.js '${{ secrets.XYB }}'
-
-      - name: 运行签到 - 18点签到
-        if: github.event.schedule == '0 10 * * *'  # 仅在18点任务时执行
-        run: |
-          node ./index.js '${{ secrets.YXY }}'
